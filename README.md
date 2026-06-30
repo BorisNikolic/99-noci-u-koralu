@@ -1,8 +1,9 @@
 # 🐚 99 Noći u Koralu
 
-> ▶️ **Igraj odmah (link):** https://claude.ai/code/artifact/309b801c-63a1-4415-88c7-656a25e5e571
-> (privatno na tvom claude.ai nalogu — otvori na tabletu dok si ulogovan, ili klikni *Share* na
-> artefaktu pa „bilo ko sa linkom" da otvoriš bez logovanja)
+> ▶️ **Igraj odmah (javni link, bez logovanja):** https://borisnikolic.github.io/99-noci-u-koralu/
+> Otvori na tabletu u Chrome-u → tapni **IGRAJ** (pun ekran, kontrole na ekranu). Za „pravu app":
+> Chrome meni → **Dodaj na početni ekran** (radi kao aplikacija sa ikonicom, offline).
+> Repo: https://github.com/BorisNikolic/99-noci-u-koralu
 
 **2D podvodna survival avantura za decu.** Mali dečak preživljava u koralnom svetu:
 istražuje, skuplja hranu (korale i školjke), bori se protiv kanto-mačevaca, nalazi signal,
