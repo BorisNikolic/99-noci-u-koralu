@@ -16,14 +16,22 @@ class World {
       { x: 1980, y: 1040, r: 130, n: 4 },
       { x: 980, y: 1320, r: 110, n: 3 },
     ];
+    // Dodatna zona hrane (mapa je veća zbog 5 prijatelja)
+    this.foodZones.push({ x: 2260, y: 1180, r: 120, n: 3 });
     // Patrolne tačke običnih neprijatelja
     this.enemyPosts = [
-      { x: 1320, y: 900 }, { x: 1650, y: 560 }, { x: 1750, y: 1320 }, { x: 1320, y: 1350 },
+      { x: 1320, y: 900 }, { x: 1750, y: 1320 }, { x: 1320, y: 1350 },
     ];
-    // Kavez sa prijateljem + čuvari + boss (gore-desno, „dublji kanal")
-    this.cage = { x: 2230, y: 380 };
-    this.cageGuards = [{ x: 2090, y: 470 }, { x: 2330, y: 510 }];
-    this.bossStart = { x: 2050, y: 760 };
+    // 5 prijatelja — svaki u svom kavezu sa čuvarima (raspoređeni po mapi)
+    // Bubling čuva i boss (gore-desno, „dublji kanal").
+    this.friends = [
+      { name: 'Bubling', type: 'fish',     cage: { x: 2250, y: 360 },  guards: [{ x: 2110, y: 450 }, { x: 2370, y: 470 }] },
+      { name: 'Kora',    type: 'octopus',  cage: { x: 1620, y: 250 },  guards: [{ x: 1530, y: 360 }] },
+      { name: 'Šiljo',   type: 'urchin',   cage: { x: 2380, y: 980 },  guards: [{ x: 2250, y: 1020 }] },
+      { name: 'Perla',   type: 'clam',     cage: { x: 1420, y: 1540 }, guards: [{ x: 1540, y: 1450 }] },
+      { name: 'Flopsi',  type: 'cucumber', cage: { x: 2180, y: 1540 }, guards: [{ x: 2050, y: 1460 }] },
+    ];
+    this.bossStart = { x: 2050, y: 720 };
     // Voda (dublji kanal) — vizuelno
     this.water = { x: 2050, y: 560, rx: 620, ry: 540 };
     this._decals = [];
@@ -57,7 +65,7 @@ class World {
     for (let i = 0; i < 90; i++) {
       const x = rnd() * this.w, y = rnd() * this.h;
       if (!farFromBurrow(x, y)) continue;
-      if (Utils.dist(x, y, this.cage.x, this.cage.y) < 90) continue;
+      if (this.friends.some(f => Utils.dist(x, y, f.cage.x, f.cage.y) < 90)) continue;
       const t = rnd();
       if (t < 0.5) this._decals.push({ k: 'seaweed', x, y, h: 26 + rnd() * 26, p: rnd() * 6 });
       else if (t < 0.8) this._decals.push({ k: 'coral', x, y });

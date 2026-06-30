@@ -197,26 +197,66 @@ const Art = (() => {
     ctx.restore();
   }
 
-  // ---------------------------------------------------------------- BUBLING (prijatelj)
+  // ---------------------------------------------------------------- PRIJATELJI (5 vrsta)
   function friend(ctx, f, bobT) {
-    const bob = Math.sin(bobT * 3) * 3;
+    const bob = Math.sin(bobT * 3 + (f.index || 0)) * 3;
     ctx.save();
     ctx.translate(f.x, f.y + bob);
-    // mehur
-    ctx.beginPath(); ctx.arc(0, 0, 19, 0, 6.2832);
-    ctx.fillStyle = 'rgba(150,220,240,0.30)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2; ctx.stroke();
-    // riba
+    // mehur oko prijatelja
+    ctx.beginPath(); ctx.arc(0, 0, 20, 0, 6.2832);
+    ctx.fillStyle = 'rgba(150,220,240,0.28)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2; ctx.stroke();
+    const t = f.type || 'fish';
+    if (t === 'octopus') friendOctopus(ctx, bobT);
+    else if (t === 'urchin') friendUrchin(ctx);
+    else if (t === 'clam') friendClam(ctx);
+    else if (t === 'cucumber') friendCucumber(ctx);
+    else friendFish(ctx);
+    ctx.restore();
+  }
+  function smile(ctx, x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0.1, Math.PI - 0.1); ctx.lineWidth = 1.5; ctx.strokeStyle = '#1a1a1a'; ctx.stroke(); }
+  function eyes(ctx, lx, rx, y, r) { ctx.fillStyle = '#fff'; circle(ctx, lx, y, r, '#fff'); circle(ctx, rx, y, r, '#fff'); ctx.fillStyle = '#1a1a1a'; circle(ctx, lx, y, r * 0.5, '#1a1a1a'); circle(ctx, rx, y, r * 0.5, '#1a1a1a'); }
+
+  function friendFish(ctx) {                 // Bubling
     circle(ctx, 0, 0, 12, C.friend); ol(ctx, 2.5);
-    // peraja
     ctx.fillStyle = C.friendFin;
     ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-16, -7); ctx.lineTo(-16, 7); ctx.closePath(); ctx.fill(); ol(ctx, 2);
     ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(4, -16); ctx.lineTo(7, -9); ctx.closePath(); ctx.fill(); ol(ctx, 2);
-    // oči + osmeh
-    ctx.fillStyle = '#fff'; circle(ctx, 4, -3, 4, '#fff'); circle(ctx, 9, -2, 3, '#fff');
-    ctx.fillStyle = '#1a1a1a'; circle(ctx, 5, -3, 2, '#1a1a1a'); circle(ctx, 9, -2, 1.5, '#1a1a1a');
-    ctx.beginPath(); ctx.arc(5, 4, 4, 0.1, Math.PI - 0.1); ctx.lineWidth = 1.6; ctx.strokeStyle = '#1a1a1a'; ctx.stroke();
-    ctx.restore();
+    eyes(ctx, 4, 9, -3, 3.4); smile(ctx, 5, 4, 4);
+  }
+  function friendOctopus(ctx, t) {           // Kora
+    const pink = '#d96fa0';
+    ctx.fillStyle = pink; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 2;
+    for (let i = -2; i <= 2; i++) { const x = i * 5; ctx.beginPath(); ctx.moveTo(x - 2, 5); ctx.quadraticCurveTo(x + Math.sin(t * 4 + i) * 3, 15, x + 2, 16); ctx.quadraticCurveTo(x + 4, 11, x + 2, 5); ctx.closePath(); ctx.fill(); }
+    circle(ctx, 0, -2, 12, pink); ol(ctx, 2.5);
+    ctx.strokeStyle = '#2c5f8a'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(-4, -3, 4, 0, 6.2832); ctx.stroke(); ctx.beginPath(); ctx.arc(5, -3, 4, 0, 6.2832); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-0.5, -3); ctx.lineTo(1.5, -3); ctx.stroke();
+    ctx.fillStyle = '#1a1a1a'; circle(ctx, -4, -3, 1.5, '#1a1a1a'); circle(ctx, 5, -3, 1.5, '#1a1a1a');
+    smile(ctx, 1, 3, 3);
+  }
+  function friendUrchin(ctx) {               // Šiljo
+    const pur = C.coralPurple;
+    ctx.strokeStyle = pur; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    for (let i = 0; i < 12; i++) { const a = i / 12 * 6.2832; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 8, Math.sin(a) * 8); ctx.lineTo(Math.cos(a) * 15, Math.sin(a) * 15); ctx.stroke(); }
+    circle(ctx, 0, 0, 9, pur); ol(ctx, 2.5);
+    ctx.fillStyle = C.seaweed; rr(ctx, -9, -6, 18, 4, 2); ctx.fill();
+    eyes(ctx, -3, 3, 1, 2.4);
+  }
+  function friendClam(ctx) {                 // Perla
+    ctx.fillStyle = '#e8dcc0';
+    ctx.beginPath(); ctx.moveTo(-13, 6); ctx.quadraticCurveTo(0, 18, 13, 6); ctx.quadraticCurveTo(0, 10, -13, 6); ctx.closePath(); ctx.fill(); ol(ctx, 2.5);
+    circle(ctx, 0, 0, 8, '#f0a6c0'); ol(ctx, 2);
+    ctx.fillStyle = '#fff'; rr(ctx, -7, -13, 14, 6, 2); ctx.fill(); ol(ctx, 1.5);
+    ctx.strokeStyle = '#e8503a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(0, -8); ctx.moveTo(-2, -10); ctx.lineTo(2, -10); ctx.stroke();
+    ctx.fillStyle = '#1a1a1a'; circle(ctx, -3, -1, 1.4, '#1a1a1a'); circle(ctx, 3, -1, 1.4, '#1a1a1a'); smile(ctx, 0, 2, 2.5);
+  }
+  function friendCucumber(ctx) {             // Flopsi
+    const grn = '#5fae8f';
+    ctx.fillStyle = grn; rr(ctx, -8, -8, 16, 22, 8); ctx.fill(); ol(ctx, 2.5);
+    ctx.fillStyle = 'rgba(40,90,70,0.4)'; circle(ctx, -3, 2, 1.6, 'rgba(40,90,70,0.4)'); circle(ctx, 4, 7, 1.6, 'rgba(40,90,70,0.4)');
+    ctx.fillStyle = '#c9a14a'; rr(ctx, -7, -13, 14, 5, 2); ctx.fill(); ol(ctx, 1.5);
+    eyes(ctx, -3, 4, -3, 2.6); smile(ctx, 0, 1, 3);
   }
 
   function cage(ctx, x, y, broken) {

@@ -31,9 +31,11 @@ class GameManager {
     this.decoration = new DecorationSystem();
     this.enemies = [];
     for (const pos of w.enemyPosts) this.enemies.push(new Enemy(pos.x, pos.y));
-    for (const pos of w.cageGuards) { const e = new Enemy(pos.x, pos.y); e.isGuard = true; this.enemies.push(e); }
+    // 5 prijatelja + čuvari za svaki kavez
+    this.friends = w.friends.map((def, i) => new Friend(def.cage.x, def.cage.y - 4, def.name, def.type, i, { x: def.cage.x, y: def.cage.y }));
+    w.friends.forEach((def, i) => def.guards.forEach(g => { const e = new Enemy(g.x, g.y); e.isGuard = true; e.guardOf = i; this.enemies.push(e); }));
+    this.rescuedCount = 0;
     this.boss = new Boss(w.bossStart.x, w.bossStart.y);
-    this.friend = new Friend(w.cage.x, w.cage.y - 4);
     this.pickups = []; this.effects = []; this.toasts = [];
     this.foodSlots = [];
     for (const z of w.foodZones)
@@ -98,13 +100,14 @@ class GameManager {
     p.update(dt, this);
     for (const e of this.enemies) e.update(dt, this);
     this.boss.update(dt, this);
-    this.friend.update(dt, this);
+    for (const f of this.friends) f.update(dt, this);
     for (const pk of this.pickups) pk.update(dt);
     this.hungerSys.update(dt, this);
     this.staminaSys.update(dt, this);
     this.healthSys.update(dt, this);
     this.dayNight.update(dt, this);
     this.quest.update(dt);
+    this.quest.refresh(this);
 
     this._collectPickups();
     this._updateFood(dt);
@@ -124,8 +127,9 @@ class GameManager {
     // win/lose
     if (p.dead || p.health <= 0) this._lose();
     else if (this.dayNight.nightsSurvived >= this.dayNight.total &&
-      this.friend.state !== 'caged' && this.decoration.count() >= 1) this.state = 'win';
+      this.friends.every(f => f.state !== 'caged') && this.decoration.count() >= 1) this.state = 'win';
   }
+  friendsFreed() { return this.friends.filter(f => f.state !== 'caged').length; }
 
   _lose() {
     this.state = 'lose';
@@ -137,7 +141,7 @@ class GameManager {
 
   // ============================================================= POMOĆNO
   toast(msg) { this.toasts.push({ msg, life: 3.2 }); if (this.toasts.length > 3) this.toasts.shift(); }
-  guardsRemaining() { return this.enemies.filter(e => e.isGuard && !e.dead && e.defeatT <= 0).length; }
+  guardsRemaining(index) { return this.enemies.filter(e => e.isGuard && (index == null || e.guardOf === index) && !e.dead && e.defeatT <= 0).length; }
 
   _spawnFood(slot) {
     const kind = Math.random() < 0.3 ? 'shell' : 'coral';
@@ -202,7 +206,11 @@ class GameManager {
     this.toast(`☀️ Preživeo si noć ${nights}! ${nights >= this.dayNight.total ? 'Svaka čast!' : 'Nastavi!'}`); this.sfx('day');
     this.enemies = this.enemies.filter(e => !e.isNight); // noćni nestaju u zoru
   }
-  onFriendHome() { this.toast('🏠 Bubling je bezbedan u jazbini! Bravo!'); this.quest.objective = 'Bublinga si spasio! Ukrasi jazbinu (B/✨) i preživi do kraja 3. noći.'; }
+  onFriendHome(friend) {
+    const b = this.world.burrow, a = friend.index / this.friends.length * 6.2832;
+    friend.homeSpot = { x: b.x + Math.cos(a) * 80, y: b.y + Math.sin(a) * 80 };
+    this.toast(`🏠 ${friend.name} je bezbedan u jazbini!`); this.sfx('pickup');
+  }
 
   // ============================================================= RENDER
   render() {
@@ -222,9 +230,11 @@ class GameManager {
     ctx.save(); ctx.translate(-cx, -cy);
     // dekoracije u jazbini
     for (const d of this.decoration.placed) Art.decoration(ctx, d);
-    // kavez + prijatelj
-    Art.cage(ctx, this.world.cage.x, this.world.cage.y, this.friend.state !== 'caged');
-    if (this.friend.state !== 'home') Art.friend(ctx, this.friend, this.time);
+    // kavezi + prijatelji (svi 5)
+    for (const f of this.friends) {
+      Art.cage(ctx, f.cage.x, f.cage.y, f.state !== 'caged');
+      Art.friend(ctx, f, this.time);
+    }
     // hrana / pickup
     for (const pk of this.pickups) {
       if (pk.kind === 'coral') Art.coral(ctx, pk.x, pk.y, pk.animT);

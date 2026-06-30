@@ -1,5 +1,6 @@
-/* Service worker — offline keširanje (igra radi bez interneta posle prvog otvaranja) */
-const CACHE = 'koralu-v1';
+/* Service worker — "network-first": kad ima interneta uvek povuče NAJNOVIJU
+ * verziju (pa osveži keš); kad nema interneta, igra radi iz keša (offline). */
+const CACHE = 'koralu-v3';
 const ASSETS = [
   '.', 'index.html', 'manifest.webmanifest', 'assets/icon.svg',
   'css/style.css',
@@ -14,9 +15,12 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-    const copy = resp.clone();
-    caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
-    return resp;
-  }).catch(() => caches.match('index.html'))));
+  // network-first: probaj mrežu (najnovije), osveži keš; ako padne → keš → index.html
+  e.respondWith(
+    fetch(e.request).then(resp => {
+      const copy = resp.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+      return resp;
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('index.html')))
+  );
 });

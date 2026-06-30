@@ -88,10 +88,13 @@ class UIManager {
     this.panel(ctx, W / 2 - 330, 116, 660, 42, 12, opulse ? 0.78 : 0.5);
     if (opulse) { ctx.strokeStyle = '#ffd24a'; ctx.lineWidth = 3; Art.rr(ctx, W / 2 - 330, 116, 660, 42, 12); ctx.stroke(); }
     this.wrap(ctx, '🎯 ' + game.quest.objective, W / 2, 137, 17, 624, fresh ? '#fff3c4' : '#fff');
-    // brojač čuvara kod kaveza (kad imaš signal a prijatelj je još zarobljen)
-    if (game.quest.hasSignal && game.friend.state === 'caged') {
-      const gr = game.guardsRemaining();
-      if (gr > 0) this.text(ctx, `⚔️ Pobedi čuvare kod kaveza: ${gr}`, W / 2, 170, 14, '#ffd24a', 'center');
+    // brojač spašenih prijatelja (kad imaš signal)
+    if (game.quest.hasSignal) {
+      const total = game.friends.length, freed = game.friendsFreed();
+      this.text(ctx, `🫧 Prijatelji: ${freed}/${total}`, W / 2, 170, 14, freed >= total ? '#7fe08a' : '#ffd24a', 'center');
+      // čuvari najbližeg kaveza u koji ulaziš
+      const near = game.friends.find(f => f.state === 'caged' && Utils.dist(game.player.x, game.player.y, f.cage.x, f.cage.y) < 220);
+      if (near) { const gr = game.guardsRemaining(near.index); if (gr > 0) this.text(ctx, `⚔️ Čuvari (${near.name}): ${gr}`, W / 2, 190, 13, '#ff9d7a', 'center'); }
     }
 
     // --- boss bar ---
@@ -231,7 +234,7 @@ class UIManager {
       this._bg(ctx, '#103a5a');
       this.text(ctx, '99 NOĆI U KORALU', W / 2, H * 0.26, 64, '#ffd24a', 'center', '800');
       this.text(ctx, '2D podvodna survival avantura', W / 2, H * 0.26 + 48, 22, '#bfe6f0', 'center');
-      this.wrap(ctx, 'Preživi 3 noći • jedi korale i školjke da ne ogladniš • pobedi kanto-mačevce • nađi signal • spasi Bublinga • ukrasi jazbinu!', W / 2, H * 0.44, 18, 760, '#e8f6fb');
+      this.wrap(ctx, 'Preživi 3 noći • jedi korale i školjke da ne ogladniš • pobedi kanto-mačevce • nađi signal • spasi svih 5 prijatelja • ukrasi jazbinu!', W / 2, H * 0.44, 18, 760, '#e8f6fb');
       this.text(ctx, game.input.touchActive
         ? '🕹️ levo = kretanje    •    desna dugmad = NAPAD · E (spasi) · JEDI · SIGNAL'
         : '⌨️ WASD = kretanje · Space = napad · E = spasi · F = jedi · Q = signal · B = ukrasi',
@@ -247,8 +250,8 @@ class UIManager {
     } else if (game.state === 'win') {
       this._bg(ctx, '#0e5a3a');
       this.text(ctx, '🎉 POBEDA! 🎉', W / 2, H * 0.28, 60, '#ffd24a', 'center', '800');
-      this.wrap(ctx, `Preživeo si ${CONFIG.dayNight.totalNights} noći, spasio Bublinga i ukrasio jazbinu!`, W / 2, H * 0.44, 22, 720, '#e8f6fb');
-      this.text(ctx, `Spašeni prijatelji: ${game.friend && game.friend.state !== 'caged' ? 1 : 0}   •   Ukrasi: ${game.decoration.count()}   •   Boss: ${game.bossDefeated ? 'pobeđen!' : 'pobegao'}`, W / 2, H * 0.55, 17, '#bfe6f0', 'center');
+      this.wrap(ctx, `Preživeo si ${CONFIG.dayNight.totalNights} noći, spasio sve prijatelje i ukrasio jazbinu!`, W / 2, H * 0.44, 22, 720, '#e8f6fb');
+      this.text(ctx, `Spašeni prijatelji: ${game.friendsFreed()}/${game.friends.length}   •   Ukrasi: ${game.decoration.count()}   •   Boss: ${game.bossDefeated ? 'pobeđen!' : 'pobegao'}`, W / 2, H * 0.55, 17, '#bfe6f0', 'center');
       this._btn(ctx, 'IGRAJ PONOVO', W / 2, H * 0.68, 'restart');
     } else if (game.state === 'lose') {
       this._bg(ctx, '#3a1620');

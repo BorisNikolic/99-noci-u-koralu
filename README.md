@@ -7,7 +7,7 @@
 
 **2D podvodna survival avantura za decu.** Mali dečak preživljava u koralnom svetu:
 istražuje, skuplja hranu (korale i školjke), bori se protiv kanto-mačevaca, nalazi signal,
-spasava prijatelja **Bublinga**, ukrašava jazbinu i pokušava da preživi noći.
+spasava svih 5 prijatelja (Bubling, Kora, Šiljo, Perla, Flopsi), ukrašava jazbinu i preživljava noći.
 
 Prototip ima **3 noći**, ali je kod napravljen tako da se lako proširi na pravih **99 noći**.
 
@@ -87,12 +87,12 @@ Bubblewrap-a, ako želiš instalaciju kao iz prodavnice.
 
 ## 🎯 Cilj (demo pobeda) i poraz
 
-**Pobediš ako:** preživiš 3 noći • spasiš Bublinga • postaviš bar 1 ukras u jazbini • ostaneš živ.
+**Pobediš ako:** preživiš 3 noći • spasiš **svih 5 prijatelja** • postaviš bar 1 ukras u jazbini • ostaneš živ.
 
 **Izgubiš ako:** ti zdravlje padne na 0 (od neprijatelja, bossa **ili gladi**).
 
 **Osnovna petlja:** istraži → nađi korale 🪸 / školjke 🐚 → jedi (F) da ne ogladniš → bori se i
-skupljaj signal 📡 → prati strelicu do kaveza → pobedi čuvare i spasi prijatelja (E) →
+skupljaj signal 📡 → prati strelicu do kaveza → pobedi čuvare i spasi prijatelje (E) →
 vrati ga u jazbinu → ukrasi jazbinu (B) → preživi noći.
 
 ---
@@ -109,7 +109,7 @@ vrati ga u jazbinu → ukrasi jazbinu (B) → preživi noći.
 - Boss: **Morski Grgo (Basso Medo)** — juriš, ugriz, boss-bar; pobeda nad njim je bonus
 - Borba kopljem (luk udarca), efekti, blagi „crtani” poraz neprijatelja (bez krvi)
 - **Signalni zadatak**: prvi poraženi neprijatelj ispušta signal → Q pokazuje strelicu do prijatelja
-- Jedan zarobljeni prijatelj **Bubling** + spasavanje (pobedi čuvare → E na kavezu → vrati kući)
+- **5 zarobljenih prijatelja** (Bubling 🐟, Kora 🐙, Šiljo 🦔, Perla 🦪, Flopsi) — svaki u svom kavezu sa čuvarima; spasi sve (pobedi čuvare → E na kavezu → prate te u jazbinu)
 - **Dan/noć ciklus** (3 noći; noću su neprijatelji brži i ima ih više; glad brže opada)
 - HUD (avatar, srca, energija, traka gladi, brojač noći, resursi, strelica zadatka, boss-bar, poruke)
 - Ukrašavanje jazbine (B) — postavljanje dekoracija uz cenu u resursima
@@ -151,8 +151,8 @@ Svi sistemi su modularni; logika je odvojena od crtanja. Balans se menja samo u 
 ## 🚀 Sledeći koraci ka punoj igri (99 noći)
 
 1. **99 noći:** u `config.js` postavi `dayNight.totalNights = 99` (i prilagodi dužine dana/noći).
-2. **Više prijatelja:** Kora (hobotnica), Šiljo (jež), Perla (školjka-lekar), Flopsi (krastavac)
-   — svaki sa svojim kavezom i mini-zadatkom; lista u `entities.js`/`world.js`.
+2. **Prijatelji:** svih 5 (Bubling, Kora, Šiljo, Perla, Flopsi) je već u igri (lista u `world.js`).
+   Sledeće: mini-priče/dijalozi za svakog, posebne moći kad ih spasiš.
 3. **Pravi sprite-ovi:** zameni programsko crtanje u `art.js` sečenjem sheet-ova iz `assets/reference/`.
 4. **Više vrsta neprijatelja i varijacija bossa**, jače noći, talasi napada.
 5. **Razvoj jazbine:** više ukrasa, krevet za spavanje (preskakanje noći), skladište resursa.

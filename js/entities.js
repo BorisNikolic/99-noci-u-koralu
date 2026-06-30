@@ -203,17 +203,27 @@ class Boss extends Entity {
   }
 }
 
-/* ----------------------------------------------------------------- FRIEND (Bubling) */
+/* ----------------------------------------------------------------- FRIEND (Bubling, Kora, Šiljo, Perla, Flopsi) */
 class Friend extends Entity {
-  constructor(x, y) { super(x, y, 16); this.state = 'caged'; this.name = 'Bubling'; }
+  // type: 'fish'|'octopus'|'urchin'|'clam'|'cucumber'; cage: {x,y} lokacija kaveza
+  constructor(x, y, name, type, index, cage) {
+    super(x, y, 16);
+    this.state = 'caged'; this.name = name; this.type = type; this.index = index; this.followOrder = 0;
+    this.cage = cage || { x, y }; this.homeSpot = null;
+  }
   update(dt, game) {
     this.animT += dt;
     if (this.state === 'following') {
-      const p = game.player;
-      const tx = p.x - Math.cos(p.facing) * 42, ty = p.y - Math.sin(p.facing) * 42 - 10;
+      // prati igrača u koloni (svaki spašeni malo iza prethodnog)
+      const p = game.player, gap = 40 + this.followOrder * 24;
+      const tx = p.x - Math.cos(p.facing) * gap, ty = p.y - Math.sin(p.facing) * gap - 10;
       this.x = Utils.lerp(this.x, tx, Math.min(1, dt * 6));
       this.y = Utils.lerp(this.y, ty, Math.min(1, dt * 6));
-      if (game.world.isInBurrow(this.x, this.y)) { this.state = 'home'; game.onFriendHome(); }
+      if (game.world.isInBurrow(this.x, this.y)) { this.state = 'home'; game.onFriendHome(this); }
+    } else if (this.state === 'home' && this.homeSpot) {
+      // mirno se smesti na svoje mesto u jazbini
+      this.x = Utils.lerp(this.x, this.homeSpot.x, Math.min(1, dt * 3));
+      this.y = Utils.lerp(this.y, this.homeSpot.y, Math.min(1, dt * 3));
     }
   }
 }

@@ -90,10 +90,14 @@ class DayNightCycle {
 
 class QuestSignalSystem {
   constructor() {
-    this.stage = 'survive';      // survive -> find -> return -> done
     this.hasSignal = false;
     this.pingT = 0;
     this.objective = 'Istraži, skupljaj hranu (🪸/🐚) i preživi! Vrati se u jazbinu kad si u opasnosti.';
+  }
+  nearestCaged(game) {
+    let best = null, bd = Infinity;
+    for (const f of game.friends) { if (f.state !== 'caged') continue; const d = Utils.dist2(game.player.x, game.player.y, f.cage.x, f.cage.y); if (d < bd) { bd = d; best = f; } }
+    return best;
   }
   // Meta tačka ka kojoj pokazuje strelica
   target(game) {
@@ -102,20 +106,31 @@ class QuestSignalSystem {
       const sig = game.pickups.find(p => p.kind === 'signal');
       if (sig) return sig;
     }
-    if (this.stage === 'find') return game.world.cage;
-    if (this.stage === 'return') return game.world.burrow;
-    if (this.stage === 'survive') {              // pokaži ka najbližoj zoni hrane
-      let best = null, bd = Infinity;
-      for (const z of game.world.foodZones) { const d = Utils.dist2(game.player.x, game.player.y, z.x, z.y); if (d < bd) { bd = d; best = z; } }
-      return best;
+    if (this.hasSignal) {
+      const f = this.nearestCaged(game);
+      return f ? f.cage : game.world.burrow;     // svi oslobođeni → kući
     }
-    return null;
+    let best = null, bd = Infinity;               // pre signala: ka najbližoj zoni hrane
+    for (const z of game.world.foodZones) { const d = Utils.dist2(game.player.x, game.player.y, z.x, z.y); if (d < bd) { bd = d; best = z; } }
+    return best;
+  }
+  // Tekst zadatka — osvežava se svaki frejm prema napretku
+  refresh(game) {
+    const total = game.friends.length, freed = game.friends.filter(f => f.state !== 'caged').length;
+    if (!this.hasSignal) {
+      this.objective = game.signalDropped
+        ? 'Pokupi SIGNAL 📡 (prati strelicu)!'
+        : 'Istraži i jedi (🪸/🐚) da preživiš. Pobedi neprijatelja da dobiješ SIGNAL 📡.';
+    } else if (freed < total) {
+      this.objective = `Spasi prijatelje! Oslobođeno ${freed}/${total}. Prati strelicu ➡️ do kaveza pa pritisni E.`;
+    } else {
+      this.objective = `Svi prijatelji spašeni (${total})! 🏆 Ukrasi jazbinu (B/✨) i preživi do kraja 3. noći.`;
+    }
   }
   giveSignal(game) {
     if (this.hasSignal) return;
-    this.hasSignal = true; this.stage = 'find';
-    this.objective = 'Imaš SIGNAL! Pritisni Q i prati strelicu do zarobljenog prijatelja 🫧';
-    game.toast('Dobio si SIGNALNU ŠKOLJKU! Pritisni Q (📡) da nađeš prijatelja');
+    this.hasSignal = true;
+    game.toast('Dobio si SIGNALNU ŠKOLJKU! Pritisni Q (📡) da nađeš prijatelje');
   }
   ping(game) {
     if (!this.hasSignal) { game.toast('Nemaš još signal! Pobedi neprijatelje da ga nađeš'); return; }
@@ -126,16 +141,17 @@ class QuestSignalSystem {
 }
 
 class RescueSystem {
+  // oslobodi najbližeg zarobljenog prijatelja (ako su mu čuvari pobeđeni)
   tryRescue(game) {
-    const p = game.player, w = game.world, fr = game.friend;
-    if (!fr || fr.state !== 'caged') return false;
-    if (Utils.dist(p.x, p.y, w.cage.x, w.cage.y) > 70) return false;
-    if (game.guardsRemaining() > 0) { game.toast('Prvo pobedi čuvare oko kaveza! ⚔️'); return true; }
-    fr.state = 'following';
-    game.quest.stage = 'return';
-    game.quest.objective = `Oslobodio si ${fr.name}! Odvedi ga nazad u jazbinu 🏠`;
-    game.toast(`🎉 Oslobodio si ${fr.name}! Vodi ga kući (jazbina)`);
-    game.shake = 6;
+    const p = game.player;
+    let best = null, bd = 70 * 70;
+    for (const f of game.friends) { if (f.state !== 'caged') continue; const d = Utils.dist2(p.x, p.y, f.cage.x, f.cage.y); if (d < bd) { bd = d; best = f; } }
+    if (!best) return false;
+    if (game.guardsRemaining(best.index) > 0) { game.toast(`Prvo pobedi čuvare oko ${best.name} kaveza! ⚔️`); return true; }
+    best.state = 'following';
+    best.followOrder = game.rescuedCount++;
+    game.toast(`🎉 Oslobodio si ${best.name}! Vodi ga u jazbinu 🏠`);
+    game.shake = 6; game.sfx('win');
     return true;
   }
 }

@@ -373,26 +373,66 @@ const Art = (() => {
     ctx.restore();
   }
 
-  // ---------------------------------------------------------------- BUBLING (prijatelj)
+  // ---------------------------------------------------------------- PRIJATELJI (5 vrsta)
   function friend(ctx, f, bobT) {
-    const bob = Math.sin(bobT * 3) * 3;
+    const bob = Math.sin(bobT * 3 + (f.index || 0)) * 3;
     ctx.save();
     ctx.translate(f.x, f.y + bob);
-    // mehur
-    ctx.beginPath(); ctx.arc(0, 0, 19, 0, 6.2832);
-    ctx.fillStyle = 'rgba(150,220,240,0.30)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2; ctx.stroke();
-    // riba
+    // mehur oko prijatelja
+    ctx.beginPath(); ctx.arc(0, 0, 20, 0, 6.2832);
+    ctx.fillStyle = 'rgba(150,220,240,0.28)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2; ctx.stroke();
+    const t = f.type || 'fish';
+    if (t === 'octopus') friendOctopus(ctx, bobT);
+    else if (t === 'urchin') friendUrchin(ctx);
+    else if (t === 'clam') friendClam(ctx);
+    else if (t === 'cucumber') friendCucumber(ctx);
+    else friendFish(ctx);
+    ctx.restore();
+  }
+  function smile(ctx, x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0.1, Math.PI - 0.1); ctx.lineWidth = 1.5; ctx.strokeStyle = '#1a1a1a'; ctx.stroke(); }
+  function eyes(ctx, lx, rx, y, r) { ctx.fillStyle = '#fff'; circle(ctx, lx, y, r, '#fff'); circle(ctx, rx, y, r, '#fff'); ctx.fillStyle = '#1a1a1a'; circle(ctx, lx, y, r * 0.5, '#1a1a1a'); circle(ctx, rx, y, r * 0.5, '#1a1a1a'); }
+
+  function friendFish(ctx) {                 // Bubling
     circle(ctx, 0, 0, 12, C.friend); ol(ctx, 2.5);
-    // peraja
     ctx.fillStyle = C.friendFin;
     ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-16, -7); ctx.lineTo(-16, 7); ctx.closePath(); ctx.fill(); ol(ctx, 2);
     ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(4, -16); ctx.lineTo(7, -9); ctx.closePath(); ctx.fill(); ol(ctx, 2);
-    // oči + osmeh
-    ctx.fillStyle = '#fff'; circle(ctx, 4, -3, 4, '#fff'); circle(ctx, 9, -2, 3, '#fff');
-    ctx.fillStyle = '#1a1a1a'; circle(ctx, 5, -3, 2, '#1a1a1a'); circle(ctx, 9, -2, 1.5, '#1a1a1a');
-    ctx.beginPath(); ctx.arc(5, 4, 4, 0.1, Math.PI - 0.1); ctx.lineWidth = 1.6; ctx.strokeStyle = '#1a1a1a'; ctx.stroke();
-    ctx.restore();
+    eyes(ctx, 4, 9, -3, 3.4); smile(ctx, 5, 4, 4);
+  }
+  function friendOctopus(ctx, t) {           // Kora
+    const pink = '#d96fa0';
+    ctx.fillStyle = pink; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 2;
+    for (let i = -2; i <= 2; i++) { const x = i * 5; ctx.beginPath(); ctx.moveTo(x - 2, 5); ctx.quadraticCurveTo(x + Math.sin(t * 4 + i) * 3, 15, x + 2, 16); ctx.quadraticCurveTo(x + 4, 11, x + 2, 5); ctx.closePath(); ctx.fill(); }
+    circle(ctx, 0, -2, 12, pink); ol(ctx, 2.5);
+    ctx.strokeStyle = '#2c5f8a'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(-4, -3, 4, 0, 6.2832); ctx.stroke(); ctx.beginPath(); ctx.arc(5, -3, 4, 0, 6.2832); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-0.5, -3); ctx.lineTo(1.5, -3); ctx.stroke();
+    ctx.fillStyle = '#1a1a1a'; circle(ctx, -4, -3, 1.5, '#1a1a1a'); circle(ctx, 5, -3, 1.5, '#1a1a1a');
+    smile(ctx, 1, 3, 3);
+  }
+  function friendUrchin(ctx) {               // Šiljo
+    const pur = C.coralPurple;
+    ctx.strokeStyle = pur; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    for (let i = 0; i < 12; i++) { const a = i / 12 * 6.2832; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 8, Math.sin(a) * 8); ctx.lineTo(Math.cos(a) * 15, Math.sin(a) * 15); ctx.stroke(); }
+    circle(ctx, 0, 0, 9, pur); ol(ctx, 2.5);
+    ctx.fillStyle = C.seaweed; rr(ctx, -9, -6, 18, 4, 2); ctx.fill();
+    eyes(ctx, -3, 3, 1, 2.4);
+  }
+  function friendClam(ctx) {                 // Perla
+    ctx.fillStyle = '#e8dcc0';
+    ctx.beginPath(); ctx.moveTo(-13, 6); ctx.quadraticCurveTo(0, 18, 13, 6); ctx.quadraticCurveTo(0, 10, -13, 6); ctx.closePath(); ctx.fill(); ol(ctx, 2.5);
+    circle(ctx, 0, 0, 8, '#f0a6c0'); ol(ctx, 2);
+    ctx.fillStyle = '#fff'; rr(ctx, -7, -13, 14, 6, 2); ctx.fill(); ol(ctx, 1.5);
+    ctx.strokeStyle = '#e8503a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(0, -8); ctx.moveTo(-2, -10); ctx.lineTo(2, -10); ctx.stroke();
+    ctx.fillStyle = '#1a1a1a'; circle(ctx, -3, -1, 1.4, '#1a1a1a'); circle(ctx, 3, -1, 1.4, '#1a1a1a'); smile(ctx, 0, 2, 2.5);
+  }
+  function friendCucumber(ctx) {             // Flopsi
+    const grn = '#5fae8f';
+    ctx.fillStyle = grn; rr(ctx, -8, -8, 16, 22, 8); ctx.fill(); ol(ctx, 2.5);
+    ctx.fillStyle = 'rgba(40,90,70,0.4)'; circle(ctx, -3, 2, 1.6, 'rgba(40,90,70,0.4)'); circle(ctx, 4, 7, 1.6, 'rgba(40,90,70,0.4)');
+    ctx.fillStyle = '#c9a14a'; rr(ctx, -7, -13, 14, 5, 2); ctx.fill(); ol(ctx, 1.5);
+    eyes(ctx, -3, 4, -3, 2.6); smile(ctx, 0, 1, 3);
   }
 
   function cage(ctx, x, y, broken) {
@@ -696,14 +736,22 @@ class World {
       { x: 1980, y: 1040, r: 130, n: 4 },
       { x: 980, y: 1320, r: 110, n: 3 },
     ];
+    // Dodatna zona hrane (mapa je veća zbog 5 prijatelja)
+    this.foodZones.push({ x: 2260, y: 1180, r: 120, n: 3 });
     // Patrolne tačke običnih neprijatelja
     this.enemyPosts = [
-      { x: 1320, y: 900 }, { x: 1650, y: 560 }, { x: 1750, y: 1320 }, { x: 1320, y: 1350 },
+      { x: 1320, y: 900 }, { x: 1750, y: 1320 }, { x: 1320, y: 1350 },
     ];
-    // Kavez sa prijateljem + čuvari + boss (gore-desno, „dublji kanal")
-    this.cage = { x: 2230, y: 380 };
-    this.cageGuards = [{ x: 2090, y: 470 }, { x: 2330, y: 510 }];
-    this.bossStart = { x: 2050, y: 760 };
+    // 5 prijatelja — svaki u svom kavezu sa čuvarima (raspoređeni po mapi)
+    // Bubling čuva i boss (gore-desno, „dublji kanal").
+    this.friends = [
+      { name: 'Bubling', type: 'fish',     cage: { x: 2250, y: 360 },  guards: [{ x: 2110, y: 450 }, { x: 2370, y: 470 }] },
+      { name: 'Kora',    type: 'octopus',  cage: { x: 1620, y: 250 },  guards: [{ x: 1530, y: 360 }] },
+      { name: 'Šiljo',   type: 'urchin',   cage: { x: 2380, y: 980 },  guards: [{ x: 2250, y: 1020 }] },
+      { name: 'Perla',   type: 'clam',     cage: { x: 1420, y: 1540 }, guards: [{ x: 1540, y: 1450 }] },
+      { name: 'Flopsi',  type: 'cucumber', cage: { x: 2180, y: 1540 }, guards: [{ x: 2050, y: 1460 }] },
+    ];
+    this.bossStart = { x: 2050, y: 720 };
     // Voda (dublji kanal) — vizuelno
     this.water = { x: 2050, y: 560, rx: 620, ry: 540 };
     this._decals = [];
@@ -737,7 +785,7 @@ class World {
     for (let i = 0; i < 90; i++) {
       const x = rnd() * this.w, y = rnd() * this.h;
       if (!farFromBurrow(x, y)) continue;
-      if (Utils.dist(x, y, this.cage.x, this.cage.y) < 90) continue;
+      if (this.friends.some(f => Utils.dist(x, y, f.cage.x, f.cage.y) < 90)) continue;
       const t = rnd();
       if (t < 0.5) this._decals.push({ k: 'seaweed', x, y, h: 26 + rnd() * 26, p: rnd() * 6 });
       else if (t < 0.8) this._decals.push({ k: 'coral', x, y });
@@ -1016,17 +1064,27 @@ class Boss extends Entity {
   }
 }
 
-/* ----------------------------------------------------------------- FRIEND (Bubling) */
+/* ----------------------------------------------------------------- FRIEND (Bubling, Kora, Šiljo, Perla, Flopsi) */
 class Friend extends Entity {
-  constructor(x, y) { super(x, y, 16); this.state = 'caged'; this.name = 'Bubling'; }
+  // type: 'fish'|'octopus'|'urchin'|'clam'|'cucumber'; cage: {x,y} lokacija kaveza
+  constructor(x, y, name, type, index, cage) {
+    super(x, y, 16);
+    this.state = 'caged'; this.name = name; this.type = type; this.index = index; this.followOrder = 0;
+    this.cage = cage || { x, y }; this.homeSpot = null;
+  }
   update(dt, game) {
     this.animT += dt;
     if (this.state === 'following') {
-      const p = game.player;
-      const tx = p.x - Math.cos(p.facing) * 42, ty = p.y - Math.sin(p.facing) * 42 - 10;
+      // prati igrača u koloni (svaki spašeni malo iza prethodnog)
+      const p = game.player, gap = 40 + this.followOrder * 24;
+      const tx = p.x - Math.cos(p.facing) * gap, ty = p.y - Math.sin(p.facing) * gap - 10;
       this.x = Utils.lerp(this.x, tx, Math.min(1, dt * 6));
       this.y = Utils.lerp(this.y, ty, Math.min(1, dt * 6));
-      if (game.world.isInBurrow(this.x, this.y)) { this.state = 'home'; game.onFriendHome(); }
+      if (game.world.isInBurrow(this.x, this.y)) { this.state = 'home'; game.onFriendHome(this); }
+    } else if (this.state === 'home' && this.homeSpot) {
+      // mirno se smesti na svoje mesto u jazbini
+      this.x = Utils.lerp(this.x, this.homeSpot.x, Math.min(1, dt * 3));
+      this.y = Utils.lerp(this.y, this.homeSpot.y, Math.min(1, dt * 3));
     }
   }
 }
@@ -1132,10 +1190,14 @@ class DayNightCycle {
 
 class QuestSignalSystem {
   constructor() {
-    this.stage = 'survive';      // survive -> find -> return -> done
     this.hasSignal = false;
     this.pingT = 0;
     this.objective = 'Istraži, skupljaj hranu (🪸/🐚) i preživi! Vrati se u jazbinu kad si u opasnosti.';
+  }
+  nearestCaged(game) {
+    let best = null, bd = Infinity;
+    for (const f of game.friends) { if (f.state !== 'caged') continue; const d = Utils.dist2(game.player.x, game.player.y, f.cage.x, f.cage.y); if (d < bd) { bd = d; best = f; } }
+    return best;
   }
   // Meta tačka ka kojoj pokazuje strelica
   target(game) {
@@ -1144,20 +1206,31 @@ class QuestSignalSystem {
       const sig = game.pickups.find(p => p.kind === 'signal');
       if (sig) return sig;
     }
-    if (this.stage === 'find') return game.world.cage;
-    if (this.stage === 'return') return game.world.burrow;
-    if (this.stage === 'survive') {              // pokaži ka najbližoj zoni hrane
-      let best = null, bd = Infinity;
-      for (const z of game.world.foodZones) { const d = Utils.dist2(game.player.x, game.player.y, z.x, z.y); if (d < bd) { bd = d; best = z; } }
-      return best;
+    if (this.hasSignal) {
+      const f = this.nearestCaged(game);
+      return f ? f.cage : game.world.burrow;     // svi oslobođeni → kući
     }
-    return null;
+    let best = null, bd = Infinity;               // pre signala: ka najbližoj zoni hrane
+    for (const z of game.world.foodZones) { const d = Utils.dist2(game.player.x, game.player.y, z.x, z.y); if (d < bd) { bd = d; best = z; } }
+    return best;
+  }
+  // Tekst zadatka — osvežava se svaki frejm prema napretku
+  refresh(game) {
+    const total = game.friends.length, freed = game.friends.filter(f => f.state !== 'caged').length;
+    if (!this.hasSignal) {
+      this.objective = game.signalDropped
+        ? 'Pokupi SIGNAL 📡 (prati strelicu)!'
+        : 'Istraži i jedi (🪸/🐚) da preživiš. Pobedi neprijatelja da dobiješ SIGNAL 📡.';
+    } else if (freed < total) {
+      this.objective = `Spasi prijatelje! Oslobođeno ${freed}/${total}. Prati strelicu ➡️ do kaveza pa pritisni E.`;
+    } else {
+      this.objective = `Svi prijatelji spašeni (${total})! 🏆 Ukrasi jazbinu (B/✨) i preživi do kraja 3. noći.`;
+    }
   }
   giveSignal(game) {
     if (this.hasSignal) return;
-    this.hasSignal = true; this.stage = 'find';
-    this.objective = 'Imaš SIGNAL! Pritisni Q i prati strelicu do zarobljenog prijatelja 🫧';
-    game.toast('Dobio si SIGNALNU ŠKOLJKU! Pritisni Q (📡) da nađeš prijatelja');
+    this.hasSignal = true;
+    game.toast('Dobio si SIGNALNU ŠKOLJKU! Pritisni Q (📡) da nađeš prijatelje');
   }
   ping(game) {
     if (!this.hasSignal) { game.toast('Nemaš još signal! Pobedi neprijatelje da ga nađeš'); return; }
@@ -1168,16 +1241,17 @@ class QuestSignalSystem {
 }
 
 class RescueSystem {
+  // oslobodi najbližeg zarobljenog prijatelja (ako su mu čuvari pobeđeni)
   tryRescue(game) {
-    const p = game.player, w = game.world, fr = game.friend;
-    if (!fr || fr.state !== 'caged') return false;
-    if (Utils.dist(p.x, p.y, w.cage.x, w.cage.y) > 70) return false;
-    if (game.guardsRemaining() > 0) { game.toast('Prvo pobedi čuvare oko kaveza! ⚔️'); return true; }
-    fr.state = 'following';
-    game.quest.stage = 'return';
-    game.quest.objective = `Oslobodio si ${fr.name}! Odvedi ga nazad u jazbinu 🏠`;
-    game.toast(`🎉 Oslobodio si ${fr.name}! Vodi ga kući (jazbina)`);
-    game.shake = 6;
+    const p = game.player;
+    let best = null, bd = 70 * 70;
+    for (const f of game.friends) { if (f.state !== 'caged') continue; const d = Utils.dist2(p.x, p.y, f.cage.x, f.cage.y); if (d < bd) { bd = d; best = f; } }
+    if (!best) return false;
+    if (game.guardsRemaining(best.index) > 0) { game.toast(`Prvo pobedi čuvare oko ${best.name} kaveza! ⚔️`); return true; }
+    best.state = 'following';
+    best.followOrder = game.rescuedCount++;
+    game.toast(`🎉 Oslobodio si ${best.name}! Vodi ga u jazbinu 🏠`);
+    game.shake = 6; game.sfx('win');
     return true;
   }
 }
@@ -1298,10 +1372,13 @@ class UIManager {
     this.panel(ctx, W / 2 - 330, 116, 660, 42, 12, opulse ? 0.78 : 0.5);
     if (opulse) { ctx.strokeStyle = '#ffd24a'; ctx.lineWidth = 3; Art.rr(ctx, W / 2 - 330, 116, 660, 42, 12); ctx.stroke(); }
     this.wrap(ctx, '🎯 ' + game.quest.objective, W / 2, 137, 17, 624, fresh ? '#fff3c4' : '#fff');
-    // brojač čuvara kod kaveza (kad imaš signal a prijatelj je još zarobljen)
-    if (game.quest.hasSignal && game.friend.state === 'caged') {
-      const gr = game.guardsRemaining();
-      if (gr > 0) this.text(ctx, `⚔️ Pobedi čuvare kod kaveza: ${gr}`, W / 2, 170, 14, '#ffd24a', 'center');
+    // brojač spašenih prijatelja (kad imaš signal)
+    if (game.quest.hasSignal) {
+      const total = game.friends.length, freed = game.friendsFreed();
+      this.text(ctx, `🫧 Prijatelji: ${freed}/${total}`, W / 2, 170, 14, freed >= total ? '#7fe08a' : '#ffd24a', 'center');
+      // čuvari najbližeg kaveza u koji ulaziš
+      const near = game.friends.find(f => f.state === 'caged' && Utils.dist(game.player.x, game.player.y, f.cage.x, f.cage.y) < 220);
+      if (near) { const gr = game.guardsRemaining(near.index); if (gr > 0) this.text(ctx, `⚔️ Čuvari (${near.name}): ${gr}`, W / 2, 190, 13, '#ff9d7a', 'center'); }
     }
 
     // --- boss bar ---
@@ -1441,7 +1518,7 @@ class UIManager {
       this._bg(ctx, '#103a5a');
       this.text(ctx, '99 NOĆI U KORALU', W / 2, H * 0.26, 64, '#ffd24a', 'center', '800');
       this.text(ctx, '2D podvodna survival avantura', W / 2, H * 0.26 + 48, 22, '#bfe6f0', 'center');
-      this.wrap(ctx, 'Preživi 3 noći • jedi korale i školjke da ne ogladniš • pobedi kanto-mačevce • nađi signal • spasi Bublinga • ukrasi jazbinu!', W / 2, H * 0.44, 18, 760, '#e8f6fb');
+      this.wrap(ctx, 'Preživi 3 noći • jedi korale i školjke da ne ogladniš • pobedi kanto-mačevce • nađi signal • spasi svih 5 prijatelja • ukrasi jazbinu!', W / 2, H * 0.44, 18, 760, '#e8f6fb');
       this.text(ctx, game.input.touchActive
         ? '🕹️ levo = kretanje    •    desna dugmad = NAPAD · E (spasi) · JEDI · SIGNAL'
         : '⌨️ WASD = kretanje · Space = napad · E = spasi · F = jedi · Q = signal · B = ukrasi',
@@ -1457,8 +1534,8 @@ class UIManager {
     } else if (game.state === 'win') {
       this._bg(ctx, '#0e5a3a');
       this.text(ctx, '🎉 POBEDA! 🎉', W / 2, H * 0.28, 60, '#ffd24a', 'center', '800');
-      this.wrap(ctx, `Preživeo si ${CONFIG.dayNight.totalNights} noći, spasio Bublinga i ukrasio jazbinu!`, W / 2, H * 0.44, 22, 720, '#e8f6fb');
-      this.text(ctx, `Spašeni prijatelji: ${game.friend && game.friend.state !== 'caged' ? 1 : 0}   •   Ukrasi: ${game.decoration.count()}   •   Boss: ${game.bossDefeated ? 'pobeđen!' : 'pobegao'}`, W / 2, H * 0.55, 17, '#bfe6f0', 'center');
+      this.wrap(ctx, `Preživeo si ${CONFIG.dayNight.totalNights} noći, spasio sve prijatelje i ukrasio jazbinu!`, W / 2, H * 0.44, 22, 720, '#e8f6fb');
+      this.text(ctx, `Spašeni prijatelji: ${game.friendsFreed()}/${game.friends.length}   •   Ukrasi: ${game.decoration.count()}   •   Boss: ${game.bossDefeated ? 'pobeđen!' : 'pobegao'}`, W / 2, H * 0.55, 17, '#bfe6f0', 'center');
       this._btn(ctx, 'IGRAJ PONOVO', W / 2, H * 0.68, 'restart');
     } else if (game.state === 'lose') {
       this._bg(ctx, '#3a1620');
@@ -1549,9 +1626,11 @@ class GameManager {
     this.decoration = new DecorationSystem();
     this.enemies = [];
     for (const pos of w.enemyPosts) this.enemies.push(new Enemy(pos.x, pos.y));
-    for (const pos of w.cageGuards) { const e = new Enemy(pos.x, pos.y); e.isGuard = true; this.enemies.push(e); }
+    // 5 prijatelja + čuvari za svaki kavez
+    this.friends = w.friends.map((def, i) => new Friend(def.cage.x, def.cage.y - 4, def.name, def.type, i, { x: def.cage.x, y: def.cage.y }));
+    w.friends.forEach((def, i) => def.guards.forEach(g => { const e = new Enemy(g.x, g.y); e.isGuard = true; e.guardOf = i; this.enemies.push(e); }));
+    this.rescuedCount = 0;
     this.boss = new Boss(w.bossStart.x, w.bossStart.y);
-    this.friend = new Friend(w.cage.x, w.cage.y - 4);
     this.pickups = []; this.effects = []; this.toasts = [];
     this.foodSlots = [];
     for (const z of w.foodZones)
@@ -1616,13 +1695,14 @@ class GameManager {
     p.update(dt, this);
     for (const e of this.enemies) e.update(dt, this);
     this.boss.update(dt, this);
-    this.friend.update(dt, this);
+    for (const f of this.friends) f.update(dt, this);
     for (const pk of this.pickups) pk.update(dt);
     this.hungerSys.update(dt, this);
     this.staminaSys.update(dt, this);
     this.healthSys.update(dt, this);
     this.dayNight.update(dt, this);
     this.quest.update(dt);
+    this.quest.refresh(this);
 
     this._collectPickups();
     this._updateFood(dt);
@@ -1642,8 +1722,9 @@ class GameManager {
     // win/lose
     if (p.dead || p.health <= 0) this._lose();
     else if (this.dayNight.nightsSurvived >= this.dayNight.total &&
-      this.friend.state !== 'caged' && this.decoration.count() >= 1) this.state = 'win';
+      this.friends.every(f => f.state !== 'caged') && this.decoration.count() >= 1) this.state = 'win';
   }
+  friendsFreed() { return this.friends.filter(f => f.state !== 'caged').length; }
 
   _lose() {
     this.state = 'lose';
@@ -1655,7 +1736,7 @@ class GameManager {
 
   // ============================================================= POMOĆNO
   toast(msg) { this.toasts.push({ msg, life: 3.2 }); if (this.toasts.length > 3) this.toasts.shift(); }
-  guardsRemaining() { return this.enemies.filter(e => e.isGuard && !e.dead && e.defeatT <= 0).length; }
+  guardsRemaining(index) { return this.enemies.filter(e => e.isGuard && (index == null || e.guardOf === index) && !e.dead && e.defeatT <= 0).length; }
 
   _spawnFood(slot) {
     const kind = Math.random() < 0.3 ? 'shell' : 'coral';
@@ -1720,7 +1801,11 @@ class GameManager {
     this.toast(`☀️ Preživeo si noć ${nights}! ${nights >= this.dayNight.total ? 'Svaka čast!' : 'Nastavi!'}`); this.sfx('day');
     this.enemies = this.enemies.filter(e => !e.isNight); // noćni nestaju u zoru
   }
-  onFriendHome() { this.toast('🏠 Bubling je bezbedan u jazbini! Bravo!'); this.quest.objective = 'Bublinga si spasio! Ukrasi jazbinu (B/✨) i preživi do kraja 3. noći.'; }
+  onFriendHome(friend) {
+    const b = this.world.burrow, a = friend.index / this.friends.length * 6.2832;
+    friend.homeSpot = { x: b.x + Math.cos(a) * 80, y: b.y + Math.sin(a) * 80 };
+    this.toast(`🏠 ${friend.name} je bezbedan u jazbini!`); this.sfx('pickup');
+  }
 
   // ============================================================= RENDER
   render() {
@@ -1740,9 +1825,11 @@ class GameManager {
     ctx.save(); ctx.translate(-cx, -cy);
     // dekoracije u jazbini
     for (const d of this.decoration.placed) Art.decoration(ctx, d);
-    // kavez + prijatelj
-    Art.cage(ctx, this.world.cage.x, this.world.cage.y, this.friend.state !== 'caged');
-    if (this.friend.state !== 'home') Art.friend(ctx, this.friend, this.time);
+    // kavezi + prijatelji (svi 5)
+    for (const f of this.friends) {
+      Art.cage(ctx, f.cage.x, f.cage.y, f.state !== 'caged');
+      Art.friend(ctx, f, this.time);
+    }
     // hrana / pickup
     for (const pk of this.pickups) {
       if (pk.kind === 'coral') Art.coral(ctx, pk.x, pk.y, pk.animT);
