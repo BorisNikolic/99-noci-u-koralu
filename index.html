@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>99 Noći u Koralu</title>
+  <meta name="description" content="2D podvodna survival avantura za decu — preživi 99 noći u koralnom svetu.">
+  <meta name="theme-color" content="#06121c">
+  <!-- PWA:START -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="99 Noći u Koralu">
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- PWA:END -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <noscript style="color:#fff;font-family:sans-serif;padding:2rem;display:block">Uključi JavaScript da bi igrao 99 Noći u Koralu.</noscript>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/systems.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+
+  <!-- PWA:START -->
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http'))
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+  </script>
+  <!-- PWA:END -->
+</body>
+</html>
